@@ -1,4 +1,11 @@
-import ProductCard from './ProductCard';
+'use client';
+
+import { useEffect, useRef } from 'react';
+import gsap from 'gsap';
+import ScrollTrigger from 'gsap/ScrollTrigger';
+import PremiumProductCard from './PremiumProductCard';
+
+gsap.registerPlugin(ScrollTrigger);
 
 const FEATURED_PRODUCTS = [
   {
@@ -7,6 +14,7 @@ const FEATURED_PRODUCTS = [
     category: 'Bags',
     price: 189.00,
     image: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Use_the_uploaded_2k_202602012229-Si3gWT2v05axfnHYdUmqC8zmx9Z2AG.jpeg',
+    badge: 'BESTSELLER',
     colors: ['#1a1511', '#c9a85d']
   },
   {
@@ -15,6 +23,7 @@ const FEATURED_PRODUCTS = [
     category: 'Caps',
     price: 45.00,
     image: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Use_the_uploaded_2k_202602012334-MX8urWmkVySJFermlzwHWG14jHkO2t.jpeg',
+    badge: 'NEW',
     colors: ['#1a1511', '#2c5aa0', '#c41e3a']
   },
   {
@@ -47,6 +56,7 @@ const FEATURED_PRODUCTS = [
     category: 'Bags',
     price: 249.00,
     image: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Use_the_uploaded_2k_202602012228-Rc26aXmsNGUAbSHCL7DwwzspZxpauI.jpeg',
+    badge: 'LUXURY',
     colors: ['#1a1511']
   },
   {
@@ -68,30 +78,74 @@ const FEATURED_PRODUCTS = [
 ];
 
 export default function FeaturedProducts() {
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const productsRef = useRef<HTMLDivElement[]>([]);
+
+  useEffect(() => {
+    // Animate title
+    gsap.from('.featured-title', {
+      scrollTrigger: {
+        trigger: sectionRef.current,
+        start: 'top 80%',
+      },
+      duration: 0.8,
+      opacity: 0,
+      y: 30,
+      ease: 'power3.out',
+    });
+
+    // Animate product cards with stagger
+    productsRef.current.forEach((product, index) => {
+      gsap.from(product, {
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: 'top 75%',
+        },
+        duration: 0.8,
+        opacity: 0,
+        y: 40,
+        rotationX: 5,
+        delay: index * 0.08,
+        ease: 'power3.out',
+        transformOrigin: 'center bottom',
+      });
+    });
+  }, []);
+
   return (
-    <section id="collections" className="py-20 px-4 sm:px-6 lg:px-8 bg-background">
+    <section ref={sectionRef} className="w-full py-20 md:py-32 bg-primary px-4 md:px-6">
       <div className="max-w-7xl mx-auto">
+        {/* Header */}
         <div className="text-center mb-16">
-          <p className="text-xs font-medium text-secondary uppercase tracking-widest mb-4">
-            New Collection
+          <p className="featured-title text-secondary text-sm md:text-base font-semibold tracking-[0.2em] mb-4">
+            CURATED
           </p>
-          <h2 className="text-4xl md:text-5xl font-serif font-bold text-primary mb-4">
-            Featured Collection
+          <h2 className="featured-title text-4xl md:text-5xl font-serif font-bold text-foreground mb-4">
+            Featured Pieces
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Handpicked premium pieces that define contemporary style and quality craftsmanship.
+          <p className="featured-title text-foreground/60 text-base md:text-lg max-w-2xl mx-auto">
+            Handpicked premium selections that define contemporary luxury and timeless craftsmanship
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {FEATURED_PRODUCTS.map((product) => (
-            <ProductCard key={product.id} {...product} />
+        {/* Products grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+          {FEATURED_PRODUCTS.map((product, index) => (
+            <div
+              key={product.id}
+              ref={(el) => {
+                if (el) productsRef.current[index] = el;
+              }}
+            >
+              <PremiumProductCard {...product} />
+            </div>
           ))}
         </div>
 
+        {/* View all button */}
         <div className="text-center mt-16">
-          <button className="px-10 py-4 border border-primary text-primary font-medium hover:bg-primary hover:text-primary-foreground transition-colors">
-            View All Products
+          <button className="px-10 py-4 bg-gradient-to-r from-secondary to-accent text-primary font-semibold rounded-full hover:shadow-lg hover:shadow-secondary/30 transition-all duration-300 hover:scale-105">
+            View All Products →
           </button>
         </div>
       </div>
